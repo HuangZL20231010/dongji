@@ -1,0 +1,19 @@
+package com.hzl.common;
+
+import com.hzl.dto.Result;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    //token失效异常
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(value = TokenException.class)
+    public Result handler(TokenException e){
+        return Result.fail( e.getMessage());
+    }
+
+}
