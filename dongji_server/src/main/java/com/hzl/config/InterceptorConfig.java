@@ -17,7 +17,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(getJwtInterceptor())
-                .addPathPatterns("/user/**") //拦截用户接口
-                .excludePathPatterns("/user/login","/user/code");//登录、验证码接口不拦截
+                .addPathPatterns("/**") //拦截所有用户接口
+                .excludePathPatterns("/user/login","/user/insertAvatarAndNickname");//登录、验证码接口不拦截
     }
 }

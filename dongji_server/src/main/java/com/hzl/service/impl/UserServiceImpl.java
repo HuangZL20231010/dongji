@@ -47,7 +47,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements IUs
         updateWrapper.eq("openid",openid);
         User user = new User();
         user.setOpenid(openid);
-        user.setNickName(nickname);
+        user.setNickname(nickname);
         user.setAvatarUrl(avatarUrl);
 
         return userMapper.update(user,updateWrapper);

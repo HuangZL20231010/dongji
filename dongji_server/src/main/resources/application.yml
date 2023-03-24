@@ -28,5 +28,25 @@ logging:
 markerhub:
   jwt:
     secret: 2023hzl20231010dongji
-    expire: 604800
+    expire: 604800  #七天
     header: Authorization
+
+
+aliyun:
+  oss:
+    # oss对外服务的访问域名
+    endpoint: oss-cn-beijing.aliyuncs.com
+    # 访问身份验证中用到用户标识
+    accessKeyId: LTAI5tNDknjpUFcXKDYGstHM
+    # 用户用于加密签名字符串和oss用来验证签名字符串的密钥
+    accessKeySecret: gIpO7TErrgcL2yUSSXBk95cpGCmwDI
+    # oss的存储空间
+    bucketName: huangzelin
+    # 上传文件大小(M)
+    maxSize: 15
+    # 上传文件夹路径前缀
+    dir:
+      prefix: dongji/images/
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: false

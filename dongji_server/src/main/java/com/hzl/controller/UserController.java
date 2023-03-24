@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -24,6 +25,9 @@ public class UserController {
 
     @Resource
     private IUserService userService;
+
+    @Autowired
+    private OssController ossController;
 
     @Autowired
     JwtUtil jwtUtil;
@@ -78,12 +82,16 @@ public class UserController {
         return Result.fail("授权失败"+ resultJson.getString("errmsg"));
     }
 
-//    @ApiOperation("存储用户个人信息")
-    @PostMapping("/person-info")
-    public Result insertPersonInfo(@RequestParam("nickname") String nickname,
-                                   @RequestParam("avatarUrl") String avatarUrl,
+//    @ApiOperation("存储用户头像和昵称")
+    @PostMapping("/insertAvatarAndNickname")
+    public Result insertPersonInfo(@RequestParam("file") MultipartFile file,
+                                   @RequestParam("nickname")String nickname,
                                    HttpServletRequest request){
 
+        //将file存到阿里云oss中,获得url
+        log.info("去上传照片");
+        String avatarUrl = ossController.upload(file);
+        log.info("上传成功："+avatarUrl);
         //获取请求头token
         String token = request.getHeader("Authorization");
         //从token中获取openid
