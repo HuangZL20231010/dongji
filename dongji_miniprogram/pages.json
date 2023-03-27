@@ -1,0 +1,104 @@
+{
+  "pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+    
+    {
+      "path": "pages/schedule/schedule",
+      "style": {
+        "enablePullDownRefresh": false
+      }
+
+    },
+    {
+      "path": "pages/exercise/exercise",
+      "style": {
+        "enablePullDownRefresh": false,
+        "navigationStyle":"custom"
+        
+      }
+
+    }, 
+    {
+      "path": "pages/user/user",
+      "style": {
+        "enablePullDownRefresh": false
+      }
+
+    }
+      ,{
+            "path" : "pages/authorize/authorize",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/userInfo/userInfo",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/interestChoose/interestChoose",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "兴趣选择",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/personality_label/personality_label",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "个性标签",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/addSchedule/addSchedule",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "添加计划",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+    ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "咚记",
+    
+    "navigationBarBackgroundColor": "#ffd4fa",
+    "backgroundColor": "#F8F8F8"
+  },
+  "uniIdRouter": {},
+
+  "tabBar": {
+    "selectedColor": "#aa55ff",
+    "list": [{
+        "pagePath": "pages/schedule/schedule",
+        "text": "计划表",
+        "iconPath": "/static/tab_icon/_事假.png",
+        "selectedIconPath": "/static/tab_icon/事假.png"
+      },
+      {
+        "pagePath": "pages/exercise/exercise",
+        "text": "运动",
+        "iconPath": "/static/tab_icon/_运动.png",
+        "selectedIconPath": "/static/tab_icon/运动.png"
+      },
+      {
+        "pagePath": "pages/user/user",
+        "text": "用户",
+        "iconPath": "static/tab_icon/_用户.png",
+        "selectedIconPath": "static/tab_icon/用户.png"
+      }
+    ]
+  }
+}
