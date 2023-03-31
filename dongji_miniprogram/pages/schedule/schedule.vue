@@ -10,7 +10,7 @@
         </view>
       </div>
     </div>
-    <schedule_item v-for="(item, index) in scheduleItems" :key="index" :scheduleItem="item"></schedule_item>
+    <schedule_item v-for="(item, index) in scheduleItems" :key="index" :scheduleItem="item" fromPage="schedule"></schedule_item>
     <view class="add-btn" @click="handleAddSchedule">添加计划</view>
   </view>
 </template>

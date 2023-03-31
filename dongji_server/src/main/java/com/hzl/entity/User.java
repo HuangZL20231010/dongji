@@ -1,13 +1,12 @@
 package com.hzl.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -23,6 +22,9 @@ public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @TableId(type = IdType.AUTO)
+    private Long id;
+
     private String openid;
 
     private String nickname;
@@ -31,14 +33,15 @@ public class User implements Serializable {
 
     private String gender;
 
-    private String school_name;
+    private String school;
 
-    private String major;
+    private String college;
 
-    private String personal_signature;
+    private String description;
 
     private String birthday;
 
+    @TableField(insertStrategy = FieldStrategy.NEVER)
     private String is_match;
 
 

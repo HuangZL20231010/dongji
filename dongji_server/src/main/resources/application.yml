@@ -5,7 +5,7 @@ spring:
     name: hzl
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/dongji?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://127.0.0.1:3306/dongji?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
     username: root
     password: root
   redis:
@@ -50,3 +50,10 @@ aliyun:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false
+
+
+
+#fastposter:
+#  token: ApfrIzxCoK1DwNZOEJCwlrnv6QZ0PCdv
+#  # endpoint: https://poster.prodapi.cn
+#  endpoint: http://121.37.235.114:5000

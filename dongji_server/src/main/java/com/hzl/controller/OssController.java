@@ -1,5 +1,6 @@
 package com.hzl.controller;
 
+import com.hzl.config.interceptor.NoNeedAuthorization;
 import com.hzl.dto.Result;
 import com.hzl.service.IOssService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/oss")
+@NoNeedAuthorization
 public class OssController {
     @Autowired
     private IOssService ossService;

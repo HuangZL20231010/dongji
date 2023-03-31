@@ -20,14 +20,30 @@ public interface IUserService  {
      */
     int addUser(String openid);
 
+
     /**
-     * 更新用户基本信息
+     * 获取用户基本信息
      * @param openid
-     * @param nickname
+     * @return
+     */
+    Result getUserInfo(String openid);
+
+
+    /**
+     * 保存用户基本信息
+     * @param user
+     * @return
+     */
+    Result saveUserInfo(User user);
+
+
+    /**
+     * 更新用户头像链接
+     *
+     * @param openid
      * @param avatarUrl
      * @return
      */
-    int updateUserWxInfo(String openid, String nickname, String avatarUrl);
 
-    Result getUserInfo();
+    int uploadAvatar(String openid, String avatarUrl);
 }

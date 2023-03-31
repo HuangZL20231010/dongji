@@ -9,7 +9,11 @@
       <view class="top" style="margin-top: 10px;">{{scheduleItem.sport}}</view>
       <view class="bottom" style="margin-bottom: 15px;">目标：{{scheduleItem.target}}</view>
     </view>
-    <view class="delete" style="margin: auto;">×</view>
+
+    <view class="info">
+      <view class="delete" style="margin: auto;" v-if="fromPage === 'schedule'">×</view>
+      <view class="choose" style="margin: auto;" v-else-if="scheduleItem.isChoose">已选择</view>
+    </view>
   </view>
 </template>
 
@@ -21,6 +25,11 @@
         type: Object,
         required: true,
         default: () => ({})
+      },
+      fromPage:{
+        type: String,
+        required: true,
+        default: () => ''
       }
     }
   }
@@ -69,10 +78,24 @@
     color: #666666;
     text-align:center;
   }
+
+  .info{
+    width: 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    // background-color: #d8bfd8;
+  }
   .delete{
     width: 5%;
     font-size: 20px;
     color: #666666;
     cursor: pointer;
+  }
+  .choose{
+    width: 5%;
+    font-size: 25rpx;
+    color: #8e8c8c;
+
   }
 </style>

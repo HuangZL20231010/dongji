@@ -68,6 +68,7 @@
       this.getInterests();
     },
     methods: {
+      //点击匹配，获取匹配的人
       getInvitees() {
         console.log("[[getInvitees]]")
         this.loading = true;
@@ -85,6 +86,8 @@
           }
         })
       },
+      
+      //获取邀请我的人
       getInviters(){
         console.log("[[getInviters]]")
         this.loading = true;

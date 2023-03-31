@@ -72,6 +72,8 @@
         }]
       };
     },
+    
+    //获取组队信息
     mounted() {
       uni.request({
         url: '/api/getData',

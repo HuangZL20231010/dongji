@@ -13,15 +13,15 @@
     data() {
       return {
         sports: {
-          "running": false,
-          "skipping": false,
-          "football": false,
-          "basketball": false,
-          "tennis": false,
-          "table_tennis": false,
-          "yoga": false,
-          "bodybuilding": false,
-          "swimming": false
+          "running": 0,
+          "skipping": 0,
+          "football": 0,
+          "basketball": 0,
+          "tennis": 0,
+          "tableTennis": 0,
+          "yoga": 0,
+          "bodybuilding": 0,
+          "swimming": 0
         },
         sportsMap: {
           "running": "跑步",
@@ -29,7 +29,7 @@
           "football": "足球",
           "basketball": "篮球",
           "tennis": "网球",
-          "table_tennis": "乒乓球",
+          "tableTennis": "乒乓球",
           "yoga": "瑜伽",
           "bodybuilding": "健身",
           "swimming": "游泳"
@@ -38,15 +38,26 @@
     },
     methods: {
       toggleSelect(key) {
-        this.sports[key] = !this.sports[key];
+        if (this.sports[key] === false) {
+          this.sports[key] = 0;
+        } else {
+          this.sports[key] = 1;
+        }
       },
       
       //保存运动到数据库
       saveSports() {
+        let token = wx.getStorageSync('token');
         uni.request({
-          url: '/saveSports',
+          url: 'http://localhost:8081/user/saveSports',
           method: 'POST',
-          data: this.sports,
+          // data: JSON.stringify(this.sports),
+          data:this.sports,
+           
+          header: {
+            'content-type': 'application/json',
+            'Authorization': token
+          },
           success: (res) => {
             uni.showToast({
               title: '保存成功',
@@ -69,9 +80,10 @@
   
     mounted() {
       uni.request({
-        url: '/data',
+        url: 'http://localhost:8081/user/getSports',
+        header: {Authorization:wx.getStorageSync('token')} ,
         success: (res) => {
-          this.sports = res.data;
+          this.sports = res.data.data;
         },
         fail: (err) => {
           console.log(err);

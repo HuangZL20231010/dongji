@@ -1,8 +1,16 @@
 package com.hzl.controller;
 
 
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONUtil;
+import com.hzl.config.interceptor.NoNeedAuthorization;
+import com.hzl.dto.PersonalityLabelDTO;
 import com.hzl.dto.Result;
+import com.hzl.entity.Interest;
 import com.hzl.entity.User;
+import com.hzl.service.IInterestService;
+import com.hzl.service.IPersonalityLabelService;
+import com.hzl.service.IPhotosService;
 import com.hzl.service.IUserService;
 import com.hzl.utils.EncryptUtil;
 import com.hzl.utils.GetUserInfoUtil;
@@ -16,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -29,11 +38,27 @@ public class UserController {
     @Autowired
     private OssController ossController;
 
+    @Resource
+    private IPersonalityLabelService personalityLabelService;
+
+    @Resource
+    private IInterestService interestService;
+
+    @Resource
+    private IPhotosService photosService;
+
     @Autowired
     JwtUtil jwtUtil;
 
 //    @ApiOperation("微信授权登录")
+
+    /**
+     * 微信授权登录
+     * @param code
+     * @return
+     */
     @PostMapping("/login")
+    @NoNeedAuthorization
     public Result authorizeLogin( @RequestParam("code") String code) {
 
         //通过code换取信息
@@ -82,10 +107,15 @@ public class UserController {
         return Result.fail("授权失败"+ resultJson.getString("errmsg"));
     }
 
-//    @ApiOperation("存储用户头像和昵称")
-    @PostMapping("/insertAvatarAndNickname")
-    public Result insertPersonInfo(@RequestParam("file") MultipartFile file,
-                                   @RequestParam("nickname")String nickname,
+    /**
+     * 存储用户头像
+     * @param file
+     * @param request
+     * @return
+     */
+    //TODO 未测试
+    @PostMapping("/uploadAvatar")
+    public Result uploadAvatar(@RequestParam("file") MultipartFile file,
                                    HttpServletRequest request){
 
         //将file存到阿里云oss中,获得url
@@ -97,7 +127,7 @@ public class UserController {
         //从token中获取openid
         String openid = jwtUtil.getOpenidFromToken(token);
 
-        int result = userService.updateUserWxInfo(openid, nickname, avatarUrl);
+        int result = userService.uploadAvatar(openid, avatarUrl);
         if(result <= 0){
             return Result.fail("更新失败！");
         }
@@ -105,8 +135,137 @@ public class UserController {
         return Result.ok();
     }
 
-    @GetMapping("/getUserInfo")
-    public Result getUserInfo(){
-        return userService.getUserInfo();
+
+    /**
+     * 保存用户基本信息
+     * @param object
+     * @param request
+     * @return
+     */
+    @PostMapping("/saveUserInfo")
+    public Result saveUserInfo(@RequestBody cn.hutool.json.JSONObject object, HttpServletRequest request){
+        //获取请求头token
+        String token = request.getHeader("Authorization");
+        //从token中获取openid
+        String openid = jwtUtil.getOpenidFromToken(token);
+
+        System.out.println(object);
+
+        User user = JSONUtil.toBean(object, User.class);
+
+        user.setOpenid(openid);
+
+        return userService.saveUserInfo(user);
     }
+
+
+
+
+    /**
+     * 用户个性标签保存
+     * @param jsonArray
+     * @param request
+     * @return
+     */
+    //TODO 未测试
+    @PostMapping("/savePersonalityLabel")
+    public Result savePersonalityLabel(@RequestBody JSONArray jsonArray, HttpServletRequest request){
+        //获取请求头token
+        String token = request.getHeader("Authorization");
+        //从token中获取openid
+        String openid = jwtUtil.getOpenidFromToken(token);
+
+        List<PersonalityLabelDTO> list = JSONUtil.toList(jsonArray, PersonalityLabelDTO.class);
+        System.out.println(list);
+
+        return personalityLabelService.savePersonalityLabel(openid,list);
+    }
+
+    /**
+     * 保存兴趣
+     * @param object
+     * @param request
+     * @return
+     */
+    @PostMapping("/saveSports")
+    public Result saveSports(@RequestBody cn.hutool.json.JSONObject object, HttpServletRequest request){
+        //获取请求头token
+        String token = request.getHeader("Authorization");
+        //从token中获取openid
+        String openid = jwtUtil.getOpenidFromToken(token);
+
+        //解析json
+//        System.out.println(object);
+
+        Interest interest = JSONUtil.toBean(object, Interest.class);
+//        System.out.println(interest);
+
+        interest.setOpenid(openid);
+
+
+        return interestService.saveSports(interest);
+    }
+
+
+    /**
+     * 用户兴趣资料加载
+     * @param request
+     * @return
+     */
+    @GetMapping("/getSports")
+    public Result getSports( HttpServletRequest request){
+        //获取请求头token
+        String token = request.getHeader("Authorization");
+        //从token中获取openid
+        String openid = jwtUtil.getOpenidFromToken(token);
+
+
+        return interestService.getSports(openid);
+    }
+
+
+    /**
+     * 获取用户基本信息
+     * @param request
+     * @return
+     */
+    @GetMapping("/getUserInfo")
+    public Result getUserInfo(HttpServletRequest request){
+        //获取请求头token
+        String token = request.getHeader("Authorization");
+        //从token中获取openid
+        String openid = jwtUtil.getOpenidFromToken(token);
+
+
+
+        return userService.getUserInfo(openid);
+    }
+
+
+    /**
+     * 上传精选图片
+     * @param file
+     * @param number
+     * @param request
+     * @return
+     */
+    @PostMapping("/uploadPhoto")
+    public Result uploadPhoto( @RequestParam("file") MultipartFile file,
+                               @RequestParam("number")int number,
+                               HttpServletRequest request){
+        //获取请求头token
+        String token = request.getHeader("Authorization");
+        //从token中获取openid
+        String openid = jwtUtil.getOpenidFromToken(token);
+
+        //将file存到阿里云oss中,获得url
+        log.info("去上传照片");
+        String photoUrl = ossController.upload(file);
+        log.info("上传成功："+photoUrl);
+
+
+        return photosService.uploadPhoto(openid,photoUrl,number);
+    }
+
+
 }

@@ -5,7 +5,6 @@
 		    const logs = wx.getStorageSync('logs') || []
 		    logs.unshift(Date.now())
 		    wx.setStorageSync('logs', logs)
-		
 		    // 登录
 		    wx.login({
 		      success: res => {
@@ -30,7 +29,7 @@
 		              // 将token保存在数据缓存中（下次无需重新获取token）
 		              wx.setStorage({
 		                key:'token',
-		                data:res.data.token
+		                data:res.data.data.token
 		              })
 		          }
 		          
@@ -47,7 +46,10 @@
 		},
     globalData: {
       userInfo: null,
-      token:null
+	  url:'http://localhost:8081/',
+      token:null,
+	  sport:'exercise_before',
+	  ismatch: false
     }
     
 	}

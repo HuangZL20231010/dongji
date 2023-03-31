@@ -142,6 +142,13 @@
             <version>3.10.2</version>
         </dependency>
 
+<!--        fastposter 海报生成器-->
+        <dependency>
+            <groupId>net.fastposter</groupId>
+            <artifactId>fastposter-client-starter</artifactId>
+            <version>1.8.2</version>
+        </dependency>
+
 
     </dependencies>
 

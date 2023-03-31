@@ -1,12 +1,14 @@
-package com.hzl.utils;
+package com.hzl.config.interceptor;
 
 import com.hzl.common.TokenException;
+import com.hzl.utils.JwtUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,13 +23,24 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler){
-        log.info("被拦截了");
 
+
+
+        // 对于注解的判断---------------------------------------------------
+        HandlerMethod handlerMethod = (HandlerMethod) handler;
+        if(handlerMethod.getMethodAnnotation(NoNeedAuthorization.class)!=null || handlerMethod.getBeanType().isAnnotationPresent(NoNeedAuthorization.class)){
+            // 如果自己拥有NoNeedToken标注或者所属的class拥有NoNeedToken 就直接放行
+            return true;
+        }
+        //------------------------------------------------------------------
+
+        log.info("被拦截了");
         //获取请求头token
         String token = request.getHeader("Authorization");
-
+        log.info("拿到token了，准备校验token");
         try{
             jwtUtil.verifyToken(token); //校验token
+            log.info("身份验证通过");
             return true; //放行请求
         }catch (ExpiredJwtException e){
             e.printStackTrace();

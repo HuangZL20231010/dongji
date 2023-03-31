@@ -43,7 +43,8 @@
       selectSport() {
         if (this.isMatchSelected) {
           this.isMatchSelected = false;
-          this.$emit('select', 'sport');
+          this.$emit('select', getApp().globalData.sport);
+
         }
       }
     }

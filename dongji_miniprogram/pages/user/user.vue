@@ -1,4 +1,5 @@
 <template>
+
   <view class="my-class">
     <view class="user-info">
       <image class="user-avatar" :src="userBaseInfo.avatarUrl" mode="aspectFill"></image>
@@ -41,7 +42,7 @@
   </view>
   
     <view class="user-button">
-      <button @tap="tapUserInfo">资料按钮</button>
+      <button @tap="tapUserInfo">个人信息</button>
       <button @tap="tapInterest">兴趣</button>
       <button>积分</button>
     </view>
@@ -59,16 +60,16 @@
           description:"",
           avatarUrl:"",
           labels: [
-            {name: '标签1', color: 'red', active: true},
-            {name: '标签2', color: 'blue', active: false},
-            {name: '标签3', color: 'green', active: true},
-            {name: '标签4', color: 'yellow', active: true},
-            {name: '标签5', color: 'purple', active: false},
-            {name: '标签6', color: 'orange', active: true},
-            {name: '标签7', color: 'pink', active: true},
-            {name: '标签8', color: 'black', active: false},
-            {name: '标签9', color: 'grey', active: true},
-            {name: '标签10', color: 'brown', active: true},
+            // {name: '标签1', color: 'red', active: true},
+            // {name: '标签2', color: 'blue', active: false},
+            // {name: '标签3', color: 'green', active: true},
+            // {name: '标签4', color: 'yellow', active: true},
+            // {name: '标签5', color: 'purple', active: false},
+            // {name: '标签6', color: 'orange', active: true},
+            // {name: '标签7', color: 'pink', active: true},
+            // {name: '标签8', color: 'black', active: false},
+            // {name: '标签9', color: 'grey', active: true},
+            // {name: '标签10', color: 'brown', active: true},
           ],
           photo1url:"",
           photo2url:"",
@@ -81,29 +82,39 @@
       };
     }, 
     
-    //获取用户基本资料
-    mounted() {
-      wx.request({
-        url: 'url',
-        method: 'GET',
-        header: {
-          'content-type': 'application/json',
-          'Authorization': getApp().globalData.token
-        },
-        success: (res) => {
-          this.userBaseInfo.nickname = res.data.nickName;
-          this.userBaseInfo.description = res.data.description;
-          this.userBaseInfo.avatarUrl = res.data.avatarUrl;
-          this.userBaseInfo.labels = res.data.labels.map(label => ({...label, active: true}));
-          this.userBaseInfo.photo1url = res.data.photo1url;
-          this.userBaseInfo.photo2url = res.data.photo2url;
-        },
-        fail: (err) => {
-          console.log(err);
-        }
-      })
-    },
+   onShow(){
+    console.log("onshow")
+      // this.userBaseInfo='';
+      this.getUserBaseInfo();
+   },
+    // mounted() {
+    //   this.getUserBaseInfo();
+    // },
     methods:{
+       //获取用户基本资料
+      getUserBaseInfo(){
+        console.log("[[正在获取用户基本资料]]")
+        let _this=this;
+        wx.request({
+          url: 'http://localhost:8081/user/getUserInfo',
+          method: 'GET',
+          header: {
+            'content-type': 'application/json',
+            'Authorization': getApp().globalData.token
+          },
+          success: (res) => {
+            _this.userBaseInfo.nickname = res.data.data.nickname;
+            _this.userBaseInfo.description = res.data.data.description;
+            _this.userBaseInfo.avatarUrl = res.data.data.avatarUrl;
+            _this.userBaseInfo.labels = res.data.data.labels;
+            _this.userBaseInfo.photo1url = res.data.data.photo1url;
+            _this.userBaseInfo.photo2url = res.data.data.photo2url;
+          },
+          fail: (err) => {
+            console.log(err);
+          }
+        })
+      },
       //点击“基本资料”跳转
       tapUserInfo(){
         wx.navigateTo({
@@ -120,8 +131,9 @@
       
       //点击“去修改”用户标签 跳转
       goToPersonalityLabel(){
+        getApp().globalData.labels = this.userBaseInfo.labels;
         wx.navigateTo({
-          url: '/pages/personality_label/personality_label?labels=' + JSON.stringify(this.labels)
+          url: '/pages/personality_label/personality_label?labels=' + JSON.stringify(this.userBaseInfo.labels)
         })
       },
       
@@ -134,21 +146,29 @@
           sourceType: ['album', 'camera'],
           success: function (res) {
             const tempFilePaths = res.tempFiles[0].tempFilePath
-            _this.userBaseInfo.photo1url=tempFilePaths
-            _this.uploadPicture(tempFilePaths)
+            //如果第一张不为空，就放到第二张
+
+            if(_this.userBaseInfo.photo1url!=""){
+              _this.userBaseInfo.photo2url=tempFilePaths
+              _this.uploadPicture(tempFilePaths,2)
+            }else{
+              _this.userBaseInfo.photo1url=tempFilePaths
+              _this.uploadPicture(tempFilePaths,1)
+            }
           }
         })
       },
       
       //上传图片
-      uploadPicture(tempFilePaths){
-        console.log("图片地址："+this.userBaseInfo.photo1url);
+      uploadPicture(tempFilePaths,number){
+        console.log("图片地址："+tempFilePaths);
         wx.uploadFile({
-          url: 'url',
+          url: getApp().globalData.url + 'user/uploadPhoto',
           filePath: tempFilePaths,
           name: 'file',
+          header: {Authorization:wx.getStorageSync('token')} ,
           formData: {
-            'user': 'test'
+            'number': number,
           },
           success: function (res){
             wx.showToast({
@@ -171,6 +191,11 @@
 </script>
 
 <style lang="scss">
+.my-class{
+  //渐变背景
+  background: linear-gradient(120deg, #ffd4fa -10%, #f3f3f3 100%);
+}
+
 .user-info {
   /* background-color: aqua; */
   display: flex;
@@ -178,7 +203,7 @@
   justify-content: flex-start;
   align-items: center;
   height: 250rpx;
-  border-bottom: 2px solid black;
+  border-bottom: 2px solid rgb(241, 203, 241);
 }
 
 .user-avatar {
@@ -199,7 +224,7 @@
 }
 
 .user-nickname {
-  font-size: 18px;
+  font-size: 30px;
   font-weight: bold;
   margin-bottom: 5px;
 }
@@ -224,13 +249,16 @@ margin-right: 10px;
 }
 
 .user-button button {
-  background-color: white;
+  // background-color: white;
+  
   color: rgb(88, 88, 238);
-  border: none;
   border-radius: 10px;
   padding: 10px;
   font-size: 16px;
   font-weight: bold;
+  //浅紫色实线边框
+  border: 1px solid rgb(88, 88, 238);
+  width: 100px;
 }
 
 
