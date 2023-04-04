@@ -32,6 +32,8 @@ public class UserDTO {
 
     private int labelsSize;
 
+    private Integer is_match;
+
     private ArrayList<PersonalityLabelDTO> labels;
 
     UserDTO(){

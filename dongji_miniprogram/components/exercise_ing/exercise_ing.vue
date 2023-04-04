@@ -4,7 +4,7 @@
     <button class="EndExercise" @click="endExercise">结束运动</button>
     <button class="takePhoto" @click="takePicture">
       <div class="iconWrapper">
-        <image src="../../static/照相机.png" class="photoImages" mode="aspectFit"></image>
+        <image src="/static/照相机.png" class="photoImages" mode="aspectFit"></image>
       </div>
       <span>记录此刻</span>
     </button>
@@ -22,7 +22,9 @@
       return {
         time: '00:00',
         count: 0,
-        timer: null
+        timer: null,
+        scope_camera:false,
+        scopewritePhotosAlbum:false,
       };
     },
     mounted() {
@@ -38,48 +40,53 @@
       clearInterval(this.timer);
     },
     methods: {
+      async authorizePermissions() {
+        const _this = this;
+        return new Promise(async (resolve, reject) => {
+          try {
+            const res = await wx.getSetting();
+      
+            if (!res.authSetting['scope.camera']) {
+              console.log("正在授权camera");
+              await wx.authorize({ scope: 'scope.camera' });
+              _this.scope_camera = true;
+            } else {
+              _this.scope_camera = true;
+            }
+      
+            if (!res.authSetting['scope.writePhotosAlbum']) {
+              console.log("正在授权writePhotosAlbum");
+              await wx.authorize({ scope: 'scope.writePhotosAlbum' });
+              _this.scopewritePhotosAlbum = true;
+            } else {
+              _this.scopewritePhotosAlbum = true;
+            }
+      
+            if (_this.scopewritePhotosAlbum && _this.scope_camera) {
+              resolve(true);
+            }
+          } catch (error) {
+            reject(error);
+          }
+        });
+      },
+
 
       //点击了拍照按钮
-      takePicture() {
-        const _this=this;
-        wx.getSetting({
-          success: function(res) {
-            if (!res.authSetting['scope.camera']) {
-              console.log("正在授权")
-              wx.authorize({
-                scope: 'scope.camera',
-                success() {
-                  _this.canTakePhoto=true;
-                },
-                fail() {
-                  wx.showToast({
-                    title: '无权限访问相机',
-                    icon: 'none',
-                    duration: 2000
-                  })
-                }
-              })
-            } 
-            if (!res.authSetting['scope.writePhotosAlbum']) {
-              console.log("正在授权")
-              wx.authorize({
-                scope: 'scope.writePhotosAlbum',
-                success() {
-                  _this.takeAndSave();
-                },
-                fail() {
-                  wx.showToast({
-                    title: '无权限访问相册',
-                    icon: 'none',
-                    duration: 2000
-                  })
-                }
-              })
-            }
+     async takePicture() {
+       console.log("点击了拍照按钮");
+       try {
+         await this.authorizePermissions();
+         this.takeAndSave();
+       } catch (error) {
+         wx.showToast({
+           title: error.message || '授权失败',
+           icon: 'none',
+           duration: 2000,
+         });
+       }
+     },
 
-          }
-        })
-      },
 
       //执行拍照和保存
       takeAndSave() {
@@ -125,7 +132,7 @@
                 editable: true,
                 placeholderText: '请输入留言',
                 success(res) {
-                   const message ="";
+                   var message ="";
                   if (res.confirm) {
                     //获取留言
                     message = res.content;                

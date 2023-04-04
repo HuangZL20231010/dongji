@@ -1,15 +1,21 @@
 server:
   port: 8081
+  ssl:
+    key-store: classpath:soulwinter.site.jks
+    key-password: 4ruto3058005z9
+    key-store-type: JKS
+    key-store-password: 4ruto3058005z9
+
 spring:
   application:
     name: hzl
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/dongji?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://8.130.92.141/dongji?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
     username: root
     password: root
   redis:
-    host: 121.37.235.114
+    host: 8.130.92.141
     port: 6379
     password: root
     lettuce:
@@ -20,6 +26,10 @@ spring:
         time-between-eviction-runs: 10s
   jackson:
     default-property-inclusion: non_null # JSON处理时忽略非空字段
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 logging:
   level:
@@ -47,9 +57,11 @@ aliyun:
     # 上传文件夹路径前缀
     dir:
       prefix: dongji/images/
+
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false
+  mapper-locations: classpath:mapper/*.xml
 
 
 

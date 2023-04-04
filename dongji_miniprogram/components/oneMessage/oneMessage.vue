@@ -1,9 +1,9 @@
 <template>
   <view class="container">
-    <view class="head">{{message.head}}</view>
+    <view class="head">{{message.title}}</view>
     <view class="message">
-      <image class="poster-left" :src="message.posterUrl"  mode="heightFix" v-if="message.type === 'poster'&&message.sender==='partner'"></image>
-      <image class="poster-right" :src="message.posterUrl" mode="heightFix" v-else-if="message.type === 'poster'&&message.sender==='me'"></image>
+      <image class="poster-left" :src="message.posterUrl"  mode="heightFix" v-if="message.type === 'poster'&&message.sender==='partner'" @click="previewImage"></image>
+      <image class="poster-right" :src="message.posterUrl" mode="heightFix" v-else-if="message.type === 'poster'&&message.sender==='me'" @click="previewImage"></image>
       <view class="text-left" v-else-if="message.type === 'text'&&message.sender==='partner'">
         <view class="triangle-left"></view>
         <span class="rotationtiao-left">{{message.content}}</span>
@@ -29,7 +29,14 @@
       return {
         
       };
-    }
+    },
+    methods: {
+        previewImage() {
+          wx.previewImage({
+            urls: [this.message.posterUrl],
+          })
+        }
+      }
   }
 </script>
 

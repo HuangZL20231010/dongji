@@ -10,6 +10,7 @@ import com.hzl.dto.UserDTO;
 import com.hzl.entity.PersonalityLabel;
 import com.hzl.entity.User;
 import com.hzl.mapper.UserMapper;
+import com.hzl.service.IIntegralService;
 import com.hzl.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements IUs
     @Autowired
     UserMapper userMapper;
 
+    @Autowired
+    IIntegralService integralService;
+
     @Override
     public User queryUserInfo(String openid) {
 //        return userMapper.getUserByOpenid(openid);
@@ -34,13 +38,31 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements IUs
         List<User> users = userMapper.selectList(wrapper);
 
         if (users.isEmpty())return null;
-        else return users.get(0);
+        else {
+            User user = users.get(0);
+            if(user.getIs_match()==1){
+                //先执行积分更新任务
+                integralService.updateIntegral(user);
+            }
+
+            return user;
+        }
     }
 
     @Override
     public int addUser(String openid) {
         User user = new User();
         user.setOpenid(openid);
+        user.setIs_match(0);
+        user.setNickname("我想改名");
+        user.setDescription("我运动，我快乐~");
+        user.setAvatarUrl("https://huangzelin.oss-cn-beijing.aliyuncs.com/dongji/images/2023-03-31f41dac0bc4d44068b9618f316dbb65085a60e1aee2489001a8c53d956f71c61.jpg");
+
+        //同时创建personalityLabel，interest，photos
+        userMapper.insertPersonalityLabel(openid);
+        userMapper.insertInterest(openid);
+        userMapper.insertPhotos(openid);
+
         return userMapper.insert(user);
     }
 
@@ -69,7 +91,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements IUs
         set.add("游戏");
         set.add("编程");
         set.add("健身");
-        set.add("王者荣耀");
+        set.add("考研党");
         set.add("工作狂");
         int count=9;//计算需要提供几个
 

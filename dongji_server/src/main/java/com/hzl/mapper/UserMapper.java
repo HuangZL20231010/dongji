@@ -5,6 +5,7 @@ import com.hzl.dto.PersonalityLabelDTO;
 import com.hzl.dto.UserDTO;
 import com.hzl.entity.PersonalityLabel;
 import com.hzl.entity.User;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -23,5 +24,12 @@ public interface UserMapper extends BaseMapper<User> {
     PersonalityLabel getUserInfo2(String openid);
 
 
+    @Insert("insert personality_label(openid) values ('${openid}')")
+    void insertPersonalityLabel(String openid);
 
+    @Insert("insert interest(openid,running,skipping,football,basketball,tennis,table_tennis,yoga,bodybuilding,swimming) values ('${openid}',0,0,0,0,0,0,0,0,0)")
+    void insertInterest(String openid);
+
+    @Insert("insert photos(openid) values ('${openid}')")
+    void insertPhotos(String openid);
 }

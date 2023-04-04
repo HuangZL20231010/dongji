@@ -18,7 +18,6 @@
 
 <script>
   import schedule_item from "@/components/schedule_item/schedule_item.vue"
-  // import ceshi from "@/components/ceshi/ceshi.vue"
   export default {
     components: {
       schedule_item
@@ -27,20 +26,23 @@
       return {
         today: "",
         scrollItems: [],
-        scheduleItems: [{
-            startTime: "18:00",
-            endTime: "19:00",
-            sport: "跑步",
-            target: "10公里"
-          },
-          {
-            startTime: "18:00",
-            endTime: "19:00",
-            sport: "跑步",
-            target: "10公里"
-          }
+        scheduleItems: [
+          //假数据
+          // {
+          //   startTime: "18:00",
+          //   endTime: "19:00",
+          //   sport: "跑步",
+          //   target: "10公里"
+          // },
+          // {
+          //   startTime: "18:00",
+          //   endTime: "19:00",
+          //   sport: "跑步",
+          //   target: "10公里"
+          // }
         ],
-        selectedDate: null
+        selectedDate: null,
+        isRefresh:false
       }
     },
     
@@ -50,7 +52,27 @@
       this.getToday()
       this.initScrollItems()
     },
+    
+    onShow(){
+      let pages = getCurrentPages();
+      console.log("[[onshow]]")
+      console.log(this.isRefresh);
+      		let currPage = pages[pages.length - 1];
+      		if(currPage.data.isRefresh){
+      			// 重新获取数据
+      			this.getScheduleData(this.selectedDate)//获取列表数据
+      			// 每一次需要清除，否则会参数会缓存
+              	currPage.__data__.isRefresh=false
+      		}
+    },
 
+    onPullDownRefresh() {
+  console.log('Pull down to refresh');
+  // Do something to refresh the data
+      this.getScheduleData(this.selectedDate);
+  wx.stopPullDownRefresh();
+},
+    
     methods: {
       //获取当前日期
       getToday() {
@@ -89,7 +111,10 @@
         this.showDot(2);
         this.selectedDate = nowDate;
         //最后要向后端获取当前日期对应的计划
-        this.getScheduleData(nowDate);
+        setTimeout(() => {
+          this.getScheduleData(nowDate);
+        }, 1800);
+
       },
       
       //处理日期点击事件
@@ -118,16 +143,20 @@
       
       //向后端发送请求，请求日期对应的计划
       getScheduleData(date) {
-        
         console.log(date);
         // make get request to backend to retrieve schedule data
         uni.request({
-          url: '/scheduleData',
+          url: getApp().globalData.url + 'schedule/getSchedules',
+          method:"POST",
+          header: {
+            'content-type': 'application/json',
+            'Authorization': wx.getStorageSync('token')
+          },
           data:{
-            date: date
+            'date':date.toISOString().slice(0,10)
           },
           success: (res) => {
-            this.scheduleItems = res.data
+            this.scheduleItems = res.data.data
           },
           fail: (err) => {
             console.log(err)
@@ -216,6 +245,7 @@
     text-align: center;
     line-height: 80rpx;
     margin: 0 auto;
+    margin-top: 40rpx;
   }
 
   .scroll-item {

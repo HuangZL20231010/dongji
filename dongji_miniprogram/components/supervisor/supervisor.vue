@@ -45,46 +45,53 @@
         },
         togetherDay: 21,
         integral: 250,
-        messages: [{
-          type: "poster",
-          sender: "me",
-          head: "2023-1-3 19:30",
-          posterUrl: "https://img.yzcdn.cn/vant/apple-1.jpg",
-          content: null
-        },{
-          type: "text",
-          sender: "partner",
-          head:"达到了200分，解锁信息",
-          posterUrl: null,
-          content: "快乐宅男"
-        },{
-          type: "poster",
-          sender: "partner",
-          head: "2023-1-3 19:30",
-          posterUrl: "https://img.yzcdn.cn/vant/apple-1.jpg",
-          content: null
-        },{
-          type: "text",
-          sender: "me",
-          head:"达到了200分，解锁信息",
-          posterUrl: null,
-          content: "热爱运动：篮球"
-        }]
+        messages: [
+        //   {
+        //   type: "poster",
+        //   sender: "me",
+        //   head: "2023-1-3 19:30",
+        //   posterUrl: "https://img.yzcdn.cn/vant/apple-1.jpg",
+        //   content: null
+        // },{
+        //   type: "text",
+        //   sender: "partner",
+        //   head:"达到了200分，解锁信息",
+        //   posterUrl: null,
+        //   content: "快乐宅男"
+        // },{
+        //   type: "poster",
+        //   sender: "partner",
+        //   head: "2023-1-3 19:30",
+        //   posterUrl: "https://img.yzcdn.cn/vant/apple-1.jpg",
+        //   content: null
+        // },{
+        //   type: "text",
+        //   sender: "me",
+        //   head:"达到了200分，解锁信息",
+        //   posterUrl: null,
+        //   content: "热爱运动：篮球"
+        // }
+      ]
       };
     },
     
     //获取组队信息
     mounted() {
       uni.request({
-        url: '/api/getData',
+        url: getApp().globalData.url + 'supervisor/getSupervisor',
+        method:"GET",
+        header: {
+          'Authorization': wx.getStorageSync('token')
+        },
         success: (res) => {
-          this.partner = res.partner;
-          this.partner.avatarUrl = `url(${this.partner.avatarUrl})`;
-          this.me = res.me;
-          this.me.avatarUrl = `url(${this.me.avatarUrl})`;
-          this.togetherDay = res.togetherDay;
-          this.integral = res.integral;
-          this.messages = res.messages;
+          console.log(res);
+          this.partner = res.data.data.partner;
+          // this.partner.avatarUrl = `url(${this.partner.avatarUrl})`;
+          this.me = res.data.data.me;
+          // this.me.avatarUrl = `url(${this.me.avatarUrl})`;
+          this.togetherDay = res.data.data.togetherDay;
+          this.integral = res.data.data.integral;
+          this.messages = res.data.data.messageDTO;
         }
       })
     }
@@ -140,7 +147,7 @@
 
   .message-area{
     width: 90%;
-    height: 750rpx;
+    height: 59vh;
     margin: 0 auto;
     //浅紫色背景，紫色边框
     background-color: #edd7ff50;

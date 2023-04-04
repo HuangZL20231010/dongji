@@ -94,13 +94,15 @@ public class UserController {
             //查询用户是否存在
             User user = userService.queryUserInfo(openid);
             if (user != null){
+                result.put("ismatch",user.getIs_match()+"");
                 return Result.ok(result); //用户存在，返回结果
             }else { //用户不存在，新建用户信息
                 int rs = userService.addUser(openid);
                 if (rs <= 0){
                     return Result.fail("登录失败");
                 }
-                return Result.ok( result);
+                result.put("ismatch",0+"");
+                return Result.ok(result);
             }
         }
 

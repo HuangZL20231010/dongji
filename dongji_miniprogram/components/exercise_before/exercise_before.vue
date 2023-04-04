@@ -1,7 +1,8 @@
 <template>
   <view>
     <view class="schedule">
-      <text class="title">今日未完成计划:</text>
+      <text class="title">{{scheduleItems.length === 0 ? '今日计划已经完成啦，快去添加计划吧~' : '今日未完成计划:'}}</text>
+      
       <view v-for="(scheduleItem, index) in scheduleItems" :key="index" @click="changeChoose(scheduleItem)">
         <schedule_item  :scheduleItem="scheduleItem" fromPage="exercise" ></schedule_item>
       </view>
@@ -20,38 +21,64 @@
     name:"exercise_ing",
     data() {
       return {
-        scheduleItems: [{
-            startTime: "18:00",
-            endTime: "19:00",
-            sport: "跑步",
-            target: "10公里",
-            isChoose: true
-          },
-          {
-            startTime: "18:00",
-            endTime: "19:00",
-            sport: "跑步",
-            target: "10公里",
-            isChoose: false
-          }]
+        scheduleItems: [
+          // {
+          //   startTime: "18:00",
+          //   endTime: "19:00",
+          //   sport: "跑步",
+          //   target: "10公里",
+          //   isChoose: true
+          // },
+          // {
+          //   startTime: "18:00",
+          //   endTime: "19:00",
+          //   sport: "跑步",
+          //   target: "10公里",
+          //   isChoose: false
+          // }
+        ]
       };
     },
     mounted() {
-      //微信小程序的请求方式
-      wx.request({
-        url: 'http://localhost:3000/schedules',
-        success: (res) => {
-          this.scheduleItems = res.data;
-        },
-        fail: (err) => {
-          console.log(err);
-        }
-      });
+     this.getSchedules();
+    },
+    onShow() {
+     this.getSchedules();
     },
     components: {
       schedule_item
     },
     methods:{
+      getSchedules(){
+        const _this = this;
+        let date=new Date();
+        //微信小程序的请求方式
+        wx.request({
+          
+          url: getApp().globalData.url + 'schedule/getSchedules',
+            method:"POST",
+            header: {
+              'content-type': 'application/json',
+              'Authorization': wx.getStorageSync('token')
+            },
+            data:{
+              'date':date.toISOString().slice(0,10)
+            },
+          success: (res) => {
+            
+            _this.scheduleItems = res.data.data;
+            //将得到的数组中，增加一个字段isChoose，用来记录是否被选中，初始值为false
+            console.log(_this.scheduleItems)
+            _this.scheduleItems.forEach((item)=>{
+              item.isChoose = false;
+            })
+          },
+          fail: (err) => {
+            console.log(err);
+          }
+        });
+      },
+      
       changeChoose(scheduleItem){
         console.log("[[changeChoose]]");
         //记录当前点击的scheduleItem的isChoose的值
@@ -95,7 +122,7 @@
 
 <style>
   .title {
-    font-size: 20px;
+    font-size: 18px;
     text-align: left;
     margin:20rpx;
   }

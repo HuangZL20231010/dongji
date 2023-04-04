@@ -85,7 +85,7 @@ export default {
   },
   onLoad(options) {
     //从App中解析并获取labels
-    this.labels = getApp().globalData.labels
+    this.labels = getApp().globalData.userBaseInfo.labels;
     console.log("[[lebels]]");
     console.log(this.labels);
 

@@ -3,10 +3,12 @@ package com.hzl.utils;
 import com.hzl.dto.Poster;
 import net.fastposter.client.FastposterClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class FastPoster {
 
     @Autowired
@@ -32,7 +34,7 @@ public class FastPoster {
         params.put("message", poster.getMessage());
 
         // 3.生成海报并保存
-        String localUrl = client.buildPoster("2f5cdfcdaac9f081").params(params).build().save();
+        String localUrl = client.buildPoster("dac48da7299d433e").params(params).build().save();
 
         return localUrl;
     }

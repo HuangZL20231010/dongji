@@ -1,8 +1,8 @@
 <template>
   <view class="parent">
-    <view class="poster" :animation="move" id="poster">
+    <view class="poster" :animation="move" :style="{ backgroundImage: `url(${posterUrl})`, height: height }">
 
-      <view class="project-date">
+      <!-- <view class="project-date">
         <view class="project">{{ scheduleItem.sport }}</view>
         <view class="date">
           <view class="day">{{ day }}</view>
@@ -16,7 +16,7 @@
 
       <view class="message" v-if="message === ''">留言：{{ defaultMessages[Math.floor(Math.random() *
         defaultMessages.length)] }}</view>
-      <view class="message" v-else>留言：{{ message }}</view>
+      <view class="message" v-else>留言：{{ message }}</view> -->
 
     </view>
 
@@ -38,9 +38,6 @@
 </template>
 
 <script>
-import wxml2canvas from "wxml2canvas";
-import html2canvas from 'html2canvas';
-
 
 const app = getApp();
 const { pxToRpx } = app.globalData;
@@ -57,14 +54,13 @@ export default {
       defaultMessages: [
         "运动使我快乐！",
         "我运动，我健康",
-        "测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试 "
       ],
-      posterUrl: "",
       posterCanvas: null,
+      height: wx.getSystemInfoSync().windowWidth*0.9*610/510+'px',
     };
   },
   props: {
-    message: {
+    posterUrl: {
       type: String,
       default: ""
     },
@@ -75,6 +71,7 @@ export default {
   },
   mounted() {
     console.log("[[mounted]]")
+    console.log(this.height)
     this.setDate();
     // const poster = uni.createSelectorQuery().select(".poster");
     setTimeout(() => {
@@ -116,46 +113,81 @@ export default {
       getApp().globalData.sport = "exercise_before";
       this.$emit("startNewSport", 'exercise_before');
     },
-    savePosterToAlbum(){
-        this.generateImageURL();
+    savePosterToAlbum() {
+      wx.showLoading({
+        title: '保存中...',
+      });
+      wx.getSetting({
+        success: (res) => {
+          if (!res.authSetting['scope.writePhotosAlbum']) {
+            wx.authorize({
+              scope: 'scope.writePhotosAlbum',
+              success: () => {
+                // 已经授权，可以保存图片
+                this.saveToAlbum();
+              },
+              fail: () => {
+                wx.showModal({
+                  title: '保存失败',
+                  content: '请开启保存图片权限',
+                  showCancel: false,
+                  success: () => {
+                    wx.openSetting({
+                      success: (res) => {
+                        if (res.authSetting['scope.writePhotosAlbum']) {
+                          // 用户已经开启保存图片权限，可以保存图片
+                          this.saveToAlbum();
+                        }
+                      },
+                    });
+                  },
+                });
+              },
+            });
+          } else {
+            // 用户已经授权，可以保存图片
+            this.saveToAlbum();
+          }
+        },
+      });
     },
 
-
-
-
-
-    generateImageURL() {
-    const query = uni.createSelectorQuery().in(this);
-    query.select("#poster").boundingClientRect((rect) => {
-      // 创建离屏 canvas
-      const offscreenCanvas = uni.createOffscreenCanvas();
-      const offscreenCanvasContext = offscreenCanvas.getContext('2d');
-      offscreenCanvas.width = rect.width;
-      offscreenCanvas.height = rect.height;
-      
-      // 获取 DOM 节点
-      query.select("#poster").node().exec((res) => {
-        const node = res[0].node;
-        const context = node.getContext('2d');
-        
-        // 绘制图片
-        offscreenCanvasContext.drawImage(context.canvas, 0, 0, rect.width, rect.height);
-        
-        // 将离屏 canvas 导出为临时文件
-        uni.canvasToTempFilePath({
-          canvas: offscreenCanvas,
-          success: (result) => {
-            const image = result.tempFilePath;
-            this.posterUrl = image;
-            console.log("生成的图片URL: ", this.posterUrl);
-          },
-          fail: (err) => {
-            console.error("生成图片URL失败: ", err);
+    saveToAlbum(){
+      wx.downloadFile({
+        url: this.posterUrl,
+        success: (res) => {
+          if (res.statusCode === 200) {
+            wx.saveImageToPhotosAlbum({
+              filePath: res.tempFilePath,
+              success: () => {
+                wx.hideLoading();
+                wx.showToast({
+                  title: '保存成功',
+                  icon: 'success',
+                  duration: 2000,
+                });
+              },
+              fail: (err) => {
+                wx.hideLoading();
+                wx.showModal({
+                  title: '保存失败',
+                  content: '请检查相册权限设置',
+                  showCancel: false,
+                });
+              },
+            });
           }
-        });
+        },
+        fail: () => {
+          wx.hideLoading();
+          wx.showToast({
+            title: '下载失败',
+            icon: 'none',
+            duration: 2000,
+          });
+        },
       });
-    }).exec();
-  },
+    }
 
   }
 
@@ -163,7 +195,7 @@ export default {
 
 </script>
 
-<style lang="scss">
+<style lang="scss" >
 .posterBefore {
   width: 90%;
   height: 200rpx;
@@ -208,14 +240,17 @@ export default {
 
 .poster {
   // background-image: url('../../static/logo.png');
-  background-image: url('https://huangzelin.oss-cn-beijing.aliyuncs.com/dongji/images/poster/42bc70f232bfe3843e4b8463ccdcb20.jpg');
+  //background-image设为posterUrl
+  // background-image: url('https://huangzelin.oss-cn-beijing.aliyuncs.com/dongji/images/poster/42bc70f232bfe3843e4b8463ccdcb20.jpg');
   background-size: cover;
   position: absolute;
   margin-top: 90vh;
   left: 5%;
   width: 90%;
   // height: 800rpx;
-  height: 65vh;
+  //根据屏幕宽度自适应高度
+  
+  // height: 403px;
   border-radius: 120rpx;
   border: 2px solid #736ecd;
   font-size: 40rpx;
@@ -225,82 +260,82 @@ export default {
   /* 从上到下排布 */
 }
 
-.project-date {
-  width: 100%;
-  // background-color: #736ecd;
-  display: flex;
-  height: 40%;
-  padding-top: 50rpx;
-  flex: 1;
-  /* 左右排布 */
-}
+// .project-date {
+//   width: 100%;
+//   // background-color: #736ecd;
+//   display: flex;
+//   height: 40%;
+//   padding-top: 50rpx;
+//   flex: 1;
+//   /* 左右排布 */
+// }
 
-.project {
-  width: 60%;
-  height: 100%;
-  // background-color: #da4848;
-  text-align: center;
-  line-height: 100%;
-  font-size: 60rpx;
-  //垂直居中
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+// .project {
+//   width: 60%;
+//   height: 100%;
+//   // background-color: #da4848;
+//   text-align: center;
+//   line-height: 100%;
+//   font-size: 60rpx;
+//   //垂直居中
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+// }
 
-.date {
-  width: 30%;
-  height: 100%;
-  // background-color: #7e5656;
-  text-align: center;
-  line-height: 100%;
-  //实线边框
-  border: 2px solid #736ecd;
-  //圆角
-  border-radius: 10rpx;
-}
+// .date {
+//   width: 30%;
+//   height: 100%;
+//   // background-color: #7e5656;
+//   text-align: center;
+//   line-height: 100%;
+//   //实线边框
+//   border: 2px solid #736ecd;
+//   //圆角
+//   border-radius: 10rpx;
+// }
 
-.day {
+// .day {
 
-  width: 100%;
-  height: 70%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 80rpx;
-}
+//   width: 100%;
+//   height: 70%;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   font-size: 80rpx;
+// }
 
-.yearAndMonth {
-  //上边框
-  border-top: 1px solid #736ecd;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+// .yearAndMonth {
+//   //上边框
+//   border-top: 1px solid #736ecd;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+// }
 
 
-.target {
-  width: 100%;
-  height: 20%;
-  // background-color: #ca9353;
-  font-size: 40rpx;
-  //垂直居中，水平不居中
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  padding-left: 40rpx;
-}
+// .target {
+//   width: 100%;
+//   height: 20%;
+//   // background-color: #ca9353;
+//   font-size: 40rpx;
+//   //垂直居中，水平不居中
+//   display: flex;
+//   justify-content: flex-start;
+//   align-items: center;
+//   padding-left: 40rpx;
+// }
 
-.message {
-  width: 90%;
-  height: 40%;
-  // background-color: #736ecd;
-  //垂直居中，水平不居中
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  padding-left: 40rpx;
-}
+// .message {
+//   width: 90%;
+//   height: 40%;
+//   // background-color: #736ecd;
+//   //垂直居中，水平不居中
+//   display: flex;
+//   justify-content: flex-start;
+//   align-items: center;
+//   padding-left: 40rpx;
+// }
 
 .btns {
   position: absolute;

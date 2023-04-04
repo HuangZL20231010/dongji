@@ -68,7 +68,7 @@
       };
     },
     onLoad(options) {
-      this.selectedDate = options.date;
+      this.selectedDate = new Date(options.date);
       console.log("[Date]:"+this.selectedDate);
     },
       onSportChange(event) {
@@ -93,6 +93,7 @@
       //点击按钮后将数据发送到后端，并返回上一级
       post_Schedule(e) {
         console.log("[[post_Schedule]]");
+        console.log("sport"+this.sport);
         if (this.sport === '' || this.startTime === '' || this.endTime === '' || this.repeat === '' || this.target === '') {
           wx.showToast({
             title: '请填写完整信息',
@@ -120,11 +121,21 @@
           title: '加载中',
         })
         wx.request({
-          url: 'your-backend-url',
+          url: getApp().globalData.url + 'schedule/saveSchedule',
           method: 'POST',
+          header: {
+            'content-type': 'application/json',
+            'Authorization': wx.getStorageSync('token')
+          },
           data: data,
           success(res) {
             console.log(res);
+            let pages = getCurrentPages();
+            let prevPage = pages[pages.length - 2];//上一个页面
+            //直接调用上一个页面的setData()方法，把数据存到上一个页面中去
+            prevPage.setData({
+            	 isRefresh: true 
+            })
             wx.hideLoading();
             wx.navigateBack({
               delta: 1

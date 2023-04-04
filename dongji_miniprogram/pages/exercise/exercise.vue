@@ -1,11 +1,11 @@
 <template>
   <view>
     <choose_head :ismatch="ismatch" @select="handleSelect"></choose_head>
-    <match v-if="page==='match'" @change_ismatch="ismatch=$event"></match>
+    <match v-if="page==='match'" @change_ismatch="handleIsMatch" :matchFresh="matchFresh"></match>
     <supervisor v-else-if="page==='supervisor'"></supervisor>
     <exercise_before v-else-if="page==='exercise_before'" @start-exercise="handleStartExercise"></exercise_before>
     <exercise_ing v-else-if="page==='exercise_ing'" @exerciseEnd="handleEndExercise"></exercise_ing>
-    <exercise_after v-else-if="page==='exercise_after'" :scheduleItem="scheduleItem" :message="message" @startNewSport="handleStartNewSport"></exercise_after>
+    <exercise_after v-else-if="page==='exercise_after'" :scheduleItem="scheduleItem" :posterUrl="posterUrl" @startNewSport="handleStartNewSport"></exercise_after>
   </view>
 </template>
 
@@ -31,15 +31,31 @@ export default {
         page:"",
         time:'',
         message:"",
-        scheduleItem: {
-            startTime: "18:00",
-            endTime: "19:00",
-            sport: "跑步",
-            target: "10公里"
-          }
+        scheduleItem: null,
+        posterUrl: null,
+        matchFresh:false,
       };
     },
+    onPullDownRefresh(){
+      console.log("[[onPullDownRefresh]]")
+      if(this.page==="match"){
+        console.log("正在刷新");
+        this.matchFresh=true;
+        const _this=this;
+        setTimeout(function() {
+          console.log(_this.matchFresh);
+        _this.matchFresh=false;
+                console.log(_this.matchFresh);
+        }, 500);
+      }
+
+    },
+ 
     methods: {
+      handleIsMatch(ismatch){
+        this.ismatch=ismatch;
+        this.page='supervisor';
+      },
       handleSelect(page) {
         console.log(page);
         this.page=page;
@@ -51,22 +67,30 @@ export default {
       },
       handleEndExercise(res){
         console.log(res.page);
-        this.page=res.page;
+        const page=res.page;
         this.time=res.time;
         this.message=res.message;
-        console.log(res);
+        const _this=this;
 
 wx.request({
-          url: '后端接口地址',
-          method: 'POST',
+          url: getApp().globalData.url + 'poster/makePoster',
+          method:"POST",
+          header: {
+            'content-type': 'application/json',
+            'Authorization': wx.getStorageSync('token')
+          },
+
           data: {
+            scheduleId: this.scheduleItem.id,
             sport: this.scheduleItem.sport,
             target: this.scheduleItem.target,
             time: this.time,
             message: this.message
           },
+
           success: function (res) {
-            console.log(res.data)
+            _this.posterUrl=res.data.data;
+            _this.page=page;
           }
         })
 

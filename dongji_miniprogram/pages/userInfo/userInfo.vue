@@ -1,9 +1,10 @@
 <template>
   <view>
-   <view class="item" >
+   <view class="avatar-item" >
       <view class="label">头像</view>
-      <button class="avatar-wrapper" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" style="height: 100%; width: 100rpx; border-radius: 50%;">
-        <image class="avatar" :src="avatarUrl"></image>
+      <button class="avatar-wrapper" open-type="chooseAvatar" @chooseavatar="onChooseAvatar" 
+      :style="{backgroundImage: 'url(' + avatarUrl + ')'}">
+        <!-- <image class="avatar" :src="avatarUrl" mode="aspectFill"></image> -->
       </button> 
     </view>
     <view class="item" @click="editNickname">
@@ -51,7 +52,7 @@
         school: '',
         college: '',
         description: '',
-        avatarUrl:'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0'
+        avatarUrl:''
 ,
         avatarIsChanged: false,
       };
@@ -59,10 +60,11 @@
     methods: {
       onChooseAvatar(e){
         console.log("onChooseAvatar")
-        const { avatarUrl } = e.detail 
+        const { avatarUrl } =  e.detail
         this.avatarUrl = avatarUrl;
         this.avatarIsChanged = true;
       },
+      
       editNickname() {
         // code to edit nickname
       },
@@ -97,7 +99,7 @@
         if(this.avatarIsChanged){
           wx.uploadFile({
             //TODO 填写后端的url
-            url: getApp().globalData.url + '/user/uploadAvatar',
+            url: getApp().globalData.url + 'user/uploadAvatar',
             filePath: this.avatarUrl,
             name: 'file',
             header: {
@@ -127,7 +129,6 @@
             'Authorization':wx.getStorageSync('token')
           },
           data: {
-            avatarUrl: this.avatarUrl,
             gender: this.gender,
             birthday: this.birthday,
             nickname: this.nickname,
@@ -159,13 +160,15 @@
       }
     },
     onLoad(options) {
-      const userBaseInfo = JSON.parse(options.userBaseInfo);
+      const userBaseInfo = getApp().globalData.userBaseInfo;
+      console.log(userBaseInfo);
       this.nickname = userBaseInfo.nickname;
       this.gender = userBaseInfo.gender;
       this.birthday = userBaseInfo.birthday;
       this.school = userBaseInfo.school;
       this.college = userBaseInfo.college;
       this.description = userBaseInfo.description;
+      this.avatarUrl=userBaseInfo.avatarUrl;
     }
   }
 </script>
@@ -206,4 +209,41 @@
     justify-content: center;
     align-items: center;
   }
+
+  .avatar-item{
+    display: flex;
+    align-items: center;
+    height: 100rpx;
+    padding: 0 30rpx;
+    border-bottom: 1rpx solid #e5e5e5;
+
+    .label {
+      font-size: 28rpx;
+      color: #333333;
+      width: 200rpx;
+    }
+
+    .avatar-wrapper{
+  width: 100rpx;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;  // 取消注释
+  margin-right: 20rpx;
+  background-color: aqua;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+  
+    .avatar{
+      background-color: #4d7fff;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+
+  }
+
+
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <view class="container">
+  <view class="container" :style="itemStyle">
     <view class="left">
       <view class="time" style="margin-top: 10px;">{{scheduleItem.startTime}}</view>
       <view class="time" >~</view>
@@ -31,7 +31,20 @@
         required: true,
         default: () => ''
       }
-    }
+    },
+    computed: {
+  itemStyle() {
+    return this.scheduleItem.isChoose
+      ? {
+          border: '3px solid #c942c9',
+          boxShadow: '0 0 10px rgba(232, 128, 232, 0.7)',
+        }
+      : {
+          border: '1px solid #ccc',
+        };
+  },
+},
+
   }
 </script>
 

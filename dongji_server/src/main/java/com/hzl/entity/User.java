@@ -41,8 +41,7 @@ public class User implements Serializable {
 
     private String birthday;
 
-    @TableField(insertStrategy = FieldStrategy.NEVER)
-    private String is_match;
+    private Integer is_match;
 
 
 }

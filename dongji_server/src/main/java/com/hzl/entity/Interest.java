@@ -41,35 +41,35 @@ public class Interest {
 	 * table type:tinyint
 	 * table comment:0:未选中  1选中
 	 */
-	private Long running;
+	private long running;
 
 	/**
 	 * table name:skipping
 	 * table type:tinyint
 	 * table comment:null
 	 */
-	private Long skipping;
+	private long skipping;
 
 	/**
 	 * table name:football
 	 * table type:tinyint
 	 * table comment:null
 	 */
-	private Long football;
+	private long  football;
 
 	/**
 	 * table name:basketball
 	 * table type:tinyint
 	 * table comment:null
 	 */
-	private Long basketball;
+	private long  basketball;
 
 	/**
 	 * table name:tennis
 	 * table type:tinyint
 	 * table comment:null
 	 */
-	private Long tennis;
+	private long  tennis;
 
 	/**
 	 * table name:table_tennis
@@ -77,27 +77,29 @@ public class Interest {
 	 * table comment:null
 	 */
 	@TableField(value = "table_tennis")
-	private Long tableTennis;
+	private long  tableTennis;
 
 	/**
 	 * table name:yoga
 	 * table type:tinyint
 	 * table comment:null
 	 */
-	private Long yoga;
+	private long  yoga;
 
 	/**
 	 * table name:bodybuilding
 	 * table type:tinyint
 	 * table comment:null
 	 */
-	private Long bodybuilding;
+	private long  bodybuilding;
 
 	/**
 	 * table name:swimming
 	 * table type:tinyint
 	 * table comment:null
 	 */
-	private Long swimming;
+	private long  swimming;
+
+
 
 }

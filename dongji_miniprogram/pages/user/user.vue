@@ -12,7 +12,7 @@
   <view class="personalTag">
     <view class="personalTag-title">个性标签</view>
     <view class="personalTag-container">
-     <view class="personalTag-rect-container">
+      <view class="personalTag-rect-container">
         <block v-for="(item, index) in userBaseInfo.labels.slice(0,6)" :key="index">
           <view v-if="item.active" class="personalTag-label" :style="{backgroundColor: item.color}">{{item.name}}</view>
         </block>
@@ -30,8 +30,8 @@
     <view class="selectedPhotos-title">精选照片</view>
     <view class="selectedPhotos-row">
       <view class="selectedPhotos-left">
-        <image class="selectedPhotos-image" :src="userBaseInfo.photo1url" mode="aspectFill"></image>
-        <image class="selectedPhotos-image" :src="userBaseInfo.photo2url" mode="aspectFill"></image>
+        <image class="selectedPhotos-image" :src="userBaseInfo.photo1url" mode="aspectFill" @tap="previewImage(userBaseInfo.photo1url)"></image>
+        <image class="selectedPhotos-image" :src="userBaseInfo.photo2url" mode="aspectFill" @tap="previewImage(userBaseInfo.photo1url)"></image>
       </view>
       <view class="selectedPhotos-right" @tap="choosePhoto">
         <view class="personalTag-button-text">去</view>
@@ -96,19 +96,20 @@
         console.log("[[正在获取用户基本资料]]")
         let _this=this;
         wx.request({
-          url: 'http://localhost:8081/user/getUserInfo',
+          url: getApp().globalData.url +'user/getUserInfo',
           method: 'GET',
           header: {
             'content-type': 'application/json',
-            'Authorization': getApp().globalData.token
+            'Authorization': wx.getStorageSync('token')
           },
           success: (res) => {
-            _this.userBaseInfo.nickname = res.data.data.nickname;
-            _this.userBaseInfo.description = res.data.data.description;
-            _this.userBaseInfo.avatarUrl = res.data.data.avatarUrl;
-            _this.userBaseInfo.labels = res.data.data.labels;
-            _this.userBaseInfo.photo1url = res.data.data.photo1url;
-            _this.userBaseInfo.photo2url = res.data.data.photo2url;
+            _this.userBaseInfo=res.data.data;
+            // _this.userBaseInfo.nickname = res.data.data.nickname;
+            // _this.userBaseInfo.description = res.data.data.description;
+            // _this.userBaseInfo.avatarUrl = res.data.data.avatarUrl;
+            // _this.userBaseInfo.labels = res.data.data.labels;
+            // _this.userBaseInfo.photo1url = res.data.data.photo1url;
+            // _this.userBaseInfo.photo2url = res.data.data.photo2url;
           },
           fail: (err) => {
             console.log(err);
@@ -117,8 +118,9 @@
       },
       //点击“基本资料”跳转
       tapUserInfo(){
+        getApp().globalData.userBaseInfo = this.userBaseInfo;
         wx.navigateTo({
-          url: '/pages/userInfo/userInfo?userBaseInfo=' + JSON.stringify(this.userBaseInfo)
+          url: '/pages/userInfo/userInfo'
         })
       },
       
@@ -131,9 +133,9 @@
       
       //点击“去修改”用户标签 跳转
       goToPersonalityLabel(){
-        getApp().globalData.labels = this.userBaseInfo.labels;
+        getApp().globalData.userBaseInfo = this.userBaseInfo;
         wx.navigateTo({
-          url: '/pages/personality_label/personality_label?labels=' + JSON.stringify(this.userBaseInfo.labels)
+          url: '/pages/personality_label/personality_label'
         })
       },
       
@@ -148,12 +150,15 @@
             const tempFilePaths = res.tempFiles[0].tempFilePath
             //如果第一张不为空，就放到第二张
 
-            if(_this.userBaseInfo.photo1url!=""){
-              _this.userBaseInfo.photo2url=tempFilePaths
-              _this.uploadPicture(tempFilePaths,2)
-            }else{
+            if(_this.userBaseInfo.photo1url===""){
+              console.log("放在第一张了");
               _this.userBaseInfo.photo1url=tempFilePaths
               _this.uploadPicture(tempFilePaths,1)
+            }else{
+              console.log("放在第二张了");
+              _this.userBaseInfo.photo2url=tempFilePaths
+              _this.uploadPicture(tempFilePaths,2)
+
             }
           }
         })
@@ -162,6 +167,7 @@
       //上传图片
       uploadPicture(tempFilePaths,number){
         console.log("图片地址："+tempFilePaths);
+        const _this=this;
         wx.uploadFile({
           url: getApp().globalData.url + 'user/uploadPhoto',
           filePath: tempFilePaths,
@@ -171,6 +177,12 @@
             'number': number,
           },
           success: function (res){
+            if(number===1){
+              _this.userBaseInfo.photo1url=tempFilePaths
+            }else{
+              _this.userBaseInfo.photo2url=tempFilePaths
+            
+            }
             wx.showToast({
               title: '添加成功',
               icon: 'success',
@@ -185,7 +197,15 @@
             })
           }
         })
-      }
+      },
+      //放大图片
+      previewImage(url) {
+        console.log(url)
+          wx.previewImage({
+            current: url, // 当前显示图片的链接
+            urls: [this.userBaseInfo.photo1url, this.userBaseInfo.photo2url] // 需要预览的图片链接列表
+          });
+        }
     }
   }
 </script>
@@ -193,7 +213,7 @@
 <style lang="scss">
 .my-class{
   //渐变背景
-  background: linear-gradient(120deg, #ffd4fa -10%, #f3f3f3 100%);
+  background: linear-gradient(120deg, #ffeeff -10%, #ffffff 100%);
 }
 
 .user-info {
@@ -271,13 +291,15 @@ margin-right: 10px;
   justify-content: center;
   align-items: center;
   margin-top: 20rpx;
-  height: 300rpx;
+  height: 320rpx;
 }
 
 .personalTag-title {
-  font-size: 18px;
+  font-size: 40rpx;
   font-weight: bold;
   margin-bottom: 5px;
+ margin-left: 0; /* 将左外边距设置为 0 */
+width: 80%;
 }
 
 
@@ -290,10 +312,10 @@ margin-right: 10px;
   width: 95%;
   margin-left: auto;
   margin-right: auto;
-  border: 2px solid purple;
+  border: 2px solid #cb63ff;
   border-radius: 10px;
   height: 150px;
-
+ box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3); /* 添加阴影效果 */
 }
 
 
@@ -304,9 +326,19 @@ margin-right: 10px;
   align-items: center;
   margin-top: 10px;
   position: relative;
-  width: 95%;
+  width: 90%;
   margin-left: auto;
   margin-right: auto;
+  // background-color: #666;
+}
+
+.personalTag-button-container{
+  width: 10%;
+  // background-color: #666;
+  border: none;
+  color: black;
+  font-size: 16px;
+  text-align: center;
 }
 
 .personalTag-label {
@@ -361,9 +393,11 @@ margin-right: 10px;
 }
 
 .selectedPhotos-title {
-  font-size: 18px;
+  font-size: 40rpx;
   font-weight: bold;
   margin-bottom: 5px;
+ margin-left: 0; /* 将左外边距设置为 0 */
+width: 80%;
 }
 
 
@@ -375,8 +409,9 @@ margin-right: 10px;
   align-content: center;
   width: 95%;
   height: 300rpx;
-  border: 2px solid purple;
+  border: 2px solid #cb63ff;
   border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3); /* 添加阴影效果 */
 }
 
 .selectedPhotos-left {
@@ -408,6 +443,6 @@ margin-right: 10px;
 }
 .selectedPhotos-image{
   height: 250rpx;
-  margin: 10rpx;
+  margin: 5rpx;
 }
 </style>

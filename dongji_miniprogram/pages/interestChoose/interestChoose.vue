@@ -38,7 +38,7 @@
     },
     methods: {
       toggleSelect(key) {
-        if (this.sports[key] === false) {
+        if (this.sports[key] === 1) {
           this.sports[key] = 0;
         } else {
           this.sports[key] = 1;
@@ -49,7 +49,7 @@
       saveSports() {
         let token = wx.getStorageSync('token');
         uni.request({
-          url: 'http://localhost:8081/user/saveSports',
+          url: getApp().globalData.url +'user/saveSports',
           method: 'POST',
           // data: JSON.stringify(this.sports),
           data:this.sports,
@@ -80,7 +80,7 @@
   
     mounted() {
       uni.request({
-        url: 'http://localhost:8081/user/getSports',
+        url: getApp().globalData.url +'user/getSports',
         header: {Authorization:wx.getStorageSync('token')} ,
         success: (res) => {
           this.sports = res.data.data;
