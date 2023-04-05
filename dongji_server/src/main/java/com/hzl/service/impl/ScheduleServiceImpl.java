@@ -69,7 +69,11 @@ public class ScheduleServiceImpl implements IScheduleService {
         return Result.ok();
     }
 
-
+    @Override
+    public Result deleteSchedule(Schedule schedule) {
+        scheduleMapper.deleteById(schedule.getId());
+        return Result.ok();
+    }
 
 
 }

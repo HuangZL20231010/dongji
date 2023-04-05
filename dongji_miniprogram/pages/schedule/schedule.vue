@@ -10,7 +10,7 @@
         </view>
       </div>
     </div>
-    <schedule_item v-for="(item, index) in scheduleItems" :key="index" :scheduleItem="item" fromPage="schedule"></schedule_item>
+    <schedule_item v-for="(item, index) in scheduleItems" :key="index" :scheduleItem="item" fromPage="schedule" @delete-item="handleDeleteItem"></schedule_item>
     <view class="add-btn" @click="handleAddSchedule">添加计划</view>
   </view>
 </template>
@@ -26,21 +26,7 @@
       return {
         today: "",
         scrollItems: [],
-        scheduleItems: [
-          //假数据
-          // {
-          //   startTime: "18:00",
-          //   endTime: "19:00",
-          //   sport: "跑步",
-          //   target: "10公里"
-          // },
-          // {
-          //   startTime: "18:00",
-          //   endTime: "19:00",
-          //   sport: "跑步",
-          //   target: "10公里"
-          // }
-        ],
+        scheduleItems: [],
         selectedDate: null,
         isRefresh:false
       }
@@ -187,7 +173,31 @@
         } else {
           console.log("Please select a date first.")
         }
-      }
+      },
+
+      //处理删除计划按钮点击事件
+      handleDeleteItem(scheduleId) {
+        uni.request({
+          url: getApp().globalData.url + 'schedule/deleteSchedule/'+scheduleId,
+          method:"GET",
+          header: {
+            'Authorization': wx.getStorageSync('token')
+          },
+          success: (res) => {
+            this.getScheduleData(this.selectedDate);
+            //显示删除成功
+            uni.showToast({
+              title: '删除成功',
+              icon: 'success',
+              duration: 2000
+            });
+          },
+          fail: (err) => {
+            console.log(err)
+          }
+        })
+      },
+
     }
   }
 </script>

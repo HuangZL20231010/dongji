@@ -61,6 +61,26 @@ public class ScheduleController {
         return scheduleService.saveSchedule(scheduleDTO,openid);
     }
 
+    /**
+     * 删除功能
+     * @param id
+     * @param request
+     * @return
+     */
+    @GetMapping(value = "/deleteSchedule/{id}")
+    public Result deleteSchedule(@PathVariable int id,HttpServletRequest request)  {
+        //获取请求头token
+        String token = request.getHeader("Authorization");
+        //从token中获取openid
+        String openid = jwtUtil.getOpenidFromToken(token);
+
+        System.out.println(id);
+        Schedule schedule = new Schedule();
+        schedule.setId(id);
+        schedule.setOpenid(openid);
+
+        return scheduleService.deleteSchedule(schedule);
+    }
 
 
 

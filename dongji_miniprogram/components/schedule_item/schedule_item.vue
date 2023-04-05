@@ -11,7 +11,7 @@
     </view>
 
     <view class="info">
-      <view class="delete" style="margin: auto;" v-if="fromPage === 'schedule'">×</view>
+      <view class="delete" style="margin: auto;" v-if="fromPage === 'schedule'" @click="deleteItem(scheduleItem.id)">×</view>
       <view class="choose" style="margin: auto;" v-else-if="scheduleItem.isChoose">已选择</view>
     </view>
   </view>
@@ -33,18 +33,22 @@
       }
     },
     computed: {
-  itemStyle() {
-    return this.scheduleItem.isChoose
-      ? {
-          border: '3px solid #c942c9',
-          boxShadow: '0 0 10px rgba(232, 128, 232, 0.7)',
-        }
-      : {
-          border: '1px solid #ccc',
-        };
-  },
-},
-
+      itemStyle() {
+        return this.scheduleItem.isChoose
+          ? {
+              border: '3px solid #c942c9',
+              boxShadow: '0 0 10px rgba(232, 128, 232, 0.7)',
+            }
+          : {
+              border: '1px solid #ccc',
+            };
+      },
+    },
+    methods: {
+      deleteItem(id) {
+        this.$emit('delete-item', id);
+      }
+    }
   }
 </script>
 

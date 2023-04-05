@@ -82,4 +82,6 @@ public class Schedule {
 	 */
 	private Integer isFinish;
 
+	private Integer deleted;
+
 }

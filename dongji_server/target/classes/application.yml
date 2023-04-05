@@ -62,7 +62,12 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false
   mapper-locations: classpath:mapper/*.xml
-
+  global-config:
+    db-config:
+      logic-delete-field: deleted #默认deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      id-type: auto
 
 
 #fastposter:

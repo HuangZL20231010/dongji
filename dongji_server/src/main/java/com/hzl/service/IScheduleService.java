@@ -12,4 +12,6 @@ public interface IScheduleService {
 
 
     Result saveSchedule(ScheduleDTO scheduleDTO, String openid);
+
+    Result deleteSchedule(Schedule schedule);
 }
