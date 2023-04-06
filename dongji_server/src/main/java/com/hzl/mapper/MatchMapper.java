@@ -18,8 +18,8 @@ public interface MatchMapper extends BaseMapper<Match> {
     @Select("select * from interest where openid='${openid}'")
     Interest getInterest(String openid);
 
-    @Select("select * from user a,(select * from interest where interest.openid!='${openid}' limit 0,50) b where a.openid=b.openid and is_match=0 ")
-    ArrayList<Interest> selectTop100(String openid);
+    @Select("select * from user a,(select * from interest where interest.openid!='${openid}' limit 0,500) b where a.openid=b.openid and is_match=0 ")
+    ArrayList<Interest> selectTop500(String openid);
 
     @Select("select * from user where openid='${openid}'")
     MatchDTO getAvatarAndNickname(String openid);

@@ -92,9 +92,9 @@ public class MatchServiceImpl implements IMatchService {
     @Override
     public Result getInvitee(String openid) {
         ArrayList<MatchDTO> list = new ArrayList<>();
-        //从interst表中查出前50条数据，根据算法，算出匹配相似度
+        //从interst表中查出前500条数据，根据算法，算出匹配相似度
         Interest self = matchMapper.getInterest(openid);
-        ArrayList<Interest> othersList = matchMapper.selectTop100(openid);
+        ArrayList<Interest> othersList = matchMapper.selectTop500(openid);
 
         //转成数组的形式
         try {

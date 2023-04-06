@@ -54,8 +54,8 @@
     globalData: {
       userInfo: null,
 	  // url:'http://8.130.92.141:8081/',
-	  // url:'https://soulwinter.site/',
-	  url:'https://localhost:8081/',
+	  url:'https://soulwinter.site/',
+	  // url:'https://localhost:8081/',
       token:null,
 	  sport:'exercise_before',
 	  ismatch: false
